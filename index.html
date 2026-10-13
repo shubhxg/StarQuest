@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StarQuest — Kids To-Do Adventure!</title>
+  <!-- Rounded Kid-Friendly Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Floating Background Clouds -->
+  <div class="sky-decor" aria-hidden="true">
+    <div class="cloud cloud-1">☁️</div>
+    <div class="cloud cloud-2">☁️</div>
+    <div class="cloud cloud-3">✨</div>
+    <div class="cloud cloud-4">🌈</div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Main App Container -->
+  <main class="app-wrapper">
+    
+    <!-- Top Header & Hero Bar -->
+    <header class="hero-card">
+      <div class="profile-area">
+        <button id="avatar-btn" class="avatar-badge" title="Click to change your buddy!">🦄</button>
+        <div class="hero-text">
+          <div class="greeting-row">
+            <span class="greeting-label">Captain</span>
+            <input type="text" id="kid-name" class="name-input" value="Leo" maxlength="14" aria-label="Your Name" />
+            <span class="edit-hint">✏️</span>
+          </div>
+          <div class="rank-pill" id="rank-badge">🌱 Rookie Explorer</div>
+        </div>
+      </div>
+
+      <div class="header-Stats">
+        <div class="star-bank" id="star-bank-box">
+          <span class="star-icon">⭐</span>
+          <div class="star-info">
+            <span class="star-count" id="star-count">0</span>
+            <span class="star-label">Stars</span>
+          </div>
+        </div>
+        <button id="sound-toggle" class="icon-btn" title="Toggle Sound Effects" aria-label="Toggle Sound">🔊</button>
+      </div>
+    </header>
+
+    <!-- Daily Progress Bar -->
+    <section class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title" id="progress-message">Let's start today's adventure! 🚀</span>
+        <span class="progress-fraction" id="progress-fraction">0 / 0 Done</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </section>
+
+    <!-- Add New Quest Section -->
+    <section class="creator-card">
+      <div class="section-heading">
+        <h2>✨ New Daily Quest</h2>
+        <button type="button" id="surprise-btn" class="surprise-btn">🎲 Surprise Quest!</button>
+      </div>
+
+      <form id="quest-form" autocomplete="off">
+        <div class="input-row">
+          <input 
+            type="text" 
+            id="quest-input" 
+            placeholder="What awesome thing will you do today?" 
+            maxlength="60"
+            required 
+          />
+          <button type="submit" class="add-btn">Add Quest ➕</button>
+        </div>
+
+        <div class="options-row">
+          <!-- Category Picker -->
+          <div class="option-group">
+            <span class="option-label">Category:</span>
+            <div class="category-pills" id="category-picker">
+              <button type="button" class="cat-pill active" data-cat="home" data-icon="🏠">🏠 Room</button>
+              <button type="button" class="cat-pill" data-cat="school" data-icon="📚">📚 Learn</button>
+              <button type="button" class="cat-pill" data-cat="health" data-icon="🦷">🦷 Hero Care</button>
+              <button type="button" class="cat-pill" data-cat="fun" data-icon="🎨">🎨 Play</button>
+            </div>
+          </div>
+
+          <!-- Star Value Picker -->
+          <div class="option-group">
+            <span class="option-label">Reward:</span>
+            <div class="star-picker" id="star-picker">
+              <button type="button" class="star-pill active" data-stars="1">⭐ 1</button>
+              <button type="button" class="star-pill" data-stars="2">⭐⭐ 2</button>
+              <button type="button" class="star-pill" data-stars="3">⭐⭐⭐ 3</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Filter Tabs & Quest List -->
+    <section class="quests-section">
+      <div class="tabs-bar">
+        <div class="filter-tabs" id="filter-tabs">
+          <button class="tab-btn active" data-filter="all">All Quests</button>
+          <button class="tab-btn" data-filter="todo">To-Do 🎯</button>
+          <button class="tab-btn" data-filter="done">Completed 🏆</button>
+        </div>
+        <button id="clear-done-btn" class="clear-btn" title="Remove finished quests">🧹 Clear Done</button>
+      </div>
+
+      <ul id="quest-list" class="quest-list">
+        <!-- Quests injected via script.js -->
+      </ul>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-mascot">🎉</div>
+        <h3>All Clear, Captain!</h3>
+        <p>Add a new quest above or hit "Surprise Quest" for a fun mission!</p>
+      </div>
+    </section>
+
+    <!-- Collectible Sticker Book -->
+    <section class="sticker-book">
+      <div class="sticker-header">
+        <h2>🏆 My Sticker Treasure Box</h2>
+        <span class="sticker-subtitle">Earn stars to unlock magical stickers!</span>
+      </div>
+      <div class="sticker-grid" id="sticker-grid">
+        <!-- Stickers injected via script.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- External JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
