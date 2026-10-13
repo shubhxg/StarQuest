@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarQuest - My Magical To-Do List!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fredoka', 'sans-serif'],
+                        body: ['Quicksand', 'sans-serif'],
+                    },
+                    colors: {
+                        candy: {
+                            pink: '#FF6B9E',
+                            purple: '#9B72FF',
+                            yellow: '#FFD166',
+                            mint: '#06D6A0',
+                            blue: '#4CC9F0',
+                            orange: '#FF9F1C',
+                            cream: '#FFFDF7',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-slow': 'float 6s ease-in-out infinite',
+                        'bounce-short': 'bounceShort 0.5s ease-in-out 1',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'pop': 'pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        bounceShort: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.18)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-4deg)' },
+                            '50%': { transform: 'rotate(4deg)' },
+                        },
+                        pop: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(160deg, #E0F4FF 0%, #FFF7D6 50%, #FFE5EC 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        h1, h2, h3, .font-kid {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* 3D Tactile Toy Button Effects */
+        .btn-toy {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid #1E293B;
+            box-shadow: 0 6px 0 #1E293B;
+        }
+        .btn-toy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #1E293B;
+        }
+        .btn-toy:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1E293B;
+        }
+
+        .card-toy {
+            border: 3px solid #1E293B;
+            box-shadow: 0 6px 0 rgba(30, 41, 59, 0.18);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .card-toy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 rgba(30, 41, 59, 0.22);
+        }
+
+        /* Custom Checkbox Animation */
+        .check-circle {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 3px solid #1E293B;
+            box-shadow: 0 3px 0 #1E293B;
+        }
+        .check-circle:active {
+            transform: scale(0.85);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #9B72FF;
+            border-radius: 9999px;
+            border: 2px solid #fff;
+        }
+
+        /* Shimmer effect for progress bar */
+        .progress-shimmer {
+            background-size: 25px 25px;
+            background-image: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.25) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.25) 50%,
+                rgba(255, 255, 255, 0.25) 75%,
+                transparent 75%,
+                transparent
+            );
+            animation: moveStripes 1s linear infinite;
+        }
+
+        @keyframes moveStripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 25px 0; }
+        }
+
+        /* Floating Star Animation */
+        @keyframes flyUp {
+            0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 1; }
+            70% { transform: translateY(-70px) scale(1.3) rotate(12deg); opacity: 1; }
+            100% { transform: translateY(-100px) scale(0.9) rotate(-10deg); opacity: 0; }
+        }
+        .floating-reward {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: flyUp 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-16 relative">
+
+    <!-- Confetti Celebration Canvas -->
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <!-- Background Decorative SVG Clouds & Stars -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <!-- Cloud Top Left -->
+        <svg class="absolute top-6 left-4 w-32 md:w-44 text-white/80 animate-float-slow" viewBox="0 0 200 120" fill="currentColor">
+            <path d="M50,95 C25,95 10,78 10,58 C10,39 25,24 44,23 C52,9 68,0 86,0 C114,0 137,21 140,48 C144,46 149,45 155,45 C175,45 190,60 190,78 C190,95 175,95 155,95 Z"/>
+        </svg>
+        <!-- Cloud Top Right -->
+        <svg class="absolute top-14 right-6 w-28 md:w-40 text-white/75 animate-float" viewBox="0 0 200 120" fill="currentColor">
+            <path d="M50,95 C25,95 10,78 10,58 C10,39 25,24 44,23 C52,9 68,0 86,0 C114,0 137,21 140,48 C144,46 149,45 155,45 C175,45 190,60 190,78 C190,95 175,95 155,95 Z"/>
+        </svg>
+        <!-- Twinkling Stars -->
+        <div class="hidden md:block absolute top-1/3 left-10 text-3xl animate-bounce">✨</div>
+        <div class="hidden md:block absolute bottom-20 right-12 text-4xl animate-float">🌈</div>
+        <div class="hidden md:block absolute top-2/3 left-14 text-3xl animate-float-slow">🎈</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-5 md:pt-8">
+
+        <header class="bg-white/90 backdrop-blur-md card-toy rounded-3xl p-4 sm:p-6 mb-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                
+                <!-- Mascot & Kid Greeting -->
+                <div class="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                    <button id="mascot-btn" title="Click me for a pep talk!" class="relative group flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-candy-yellow border-3 border-slate-800 flex items-center justify-center text-4xl sm:text-5xl shadow-md hover:scale-105 active:scale-95 transition transform cursor-pointer" style="border: 3px solid #1E293B;">
+                        <span id="mascot-emoji" class="animate-wiggle inline-block">🦄</span>
+                        <span class="absolute -bottom-1 -right-1 bg-candy-pink text-white text-xs font-kid px-2 py-0.5 rounded-full border-2 border-slate-800">Tap!</span>
+                    </button>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span id="rank-badge" class="bg-candy-purple text-white text-xs sm:text-sm font-kid px-3 py-0.5 rounded-full border-2 border-slate-800 tracking-wide">
+                                🌟 LVL 1 EXPLORER
+                            </span>
+                            <span id="current-date" class="text-xs sm:text-sm font-bold text-slate-500"></span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-kid font-bold text-slate-800 mt-1 flex items-center gap-2">
+                            <span><span id="kid-name-display">Alex</span>'s Quests!</span>
+                            <button id="edit-name-btn" title="Change Name & Avatar" class="text-sm bg-slate-100 hover:bg-candy-yellow px-2.5 py-1 rounded-xl border-2 border-slate-800 font-body font-bold transition">
+                                ✏️ Edit
+                            </button>
+                        </h1>
+                        <p id="mascot-speech" class="text-xs sm:text-sm font-bold text-candy-purple mt-0.5">
+                            "Let's collect shiny stars today!"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Star Counter & Sound Controls -->
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                    <!-- Star Bank Pill -->
+                    <div id="star-bank-box" class="flex items-center gap-2.5 bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-200 px-4 py-2.5 rounded-2xl border-3 border-slate-800 shadow-sm" style="border: 3px solid #1E293B;">
+                        <span class="text-2xl sm:text-3xl animate-spin" style="animation-duration: 8s;">⭐</span>
+                        <div>
+                            <div class="text-[11px] font-kid uppercase tracking-wider text-slate-700 leading-none">Star Bank</div>
+                            <div id="star-count" class="text-2xl sm:text-3xl font-kid font-bold text-slate-900 leading-tight">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Sticker Room Button -->
+                    <button id="open-stickers-btn" class="btn-toy bg-candy-pink hover:bg-pink-400 text-white font-kid px-3.5 py-2.5 rounded-2xl flex items-center gap-1.5 text-sm sm:text-base">
+                        <span class="text-xl">🏆</span>
+                        <span class="hidden xs:inline">Stickers</span>
+                    </button>
+
+                    <!-- Sound Toggle Button -->
+                    <button id="sound-toggle-btn" title="Toggle Sound Effects" class="btn-toy bg-candy-blue hover:bg-sky-300 text-slate-900 font-kid w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
+                        🔊
+                    </button>
+                </div>
+            </div>
+
+            <!-- Daily Mission Progress Bar -->
+            <div class="mt-5 pt-4 border-t-2 border-dashed border-slate-200">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-kid text-sm sm:text-base text-slate-700 flex items-center gap-1.5">
+                        <span>🚀 Today's Adventure Progress</span>
+                    </span>
+                    <span id="progress-text" class="font-kid text-sm sm:text-base text-candy-purple bg-purple-100 px-3 py-0.5 rounded-full border-2 border-slate-800">
+                        0 / 0 Done (0%)
+                    </span>
+                </div>
+                <div class="w-full h-6 bg-slate-100 rounded-full border-3 border-slate-800 overflow-hidden p-0.5" style="border: 3px solid #1E293B;">
+                    <div id="progress-bar" class="h-full rounded-full bg-gradient-to-r from-candy-mint via-emerald-400 to-teal-400 progress-shimmer transition-all duration-500 flex items-center justify-end pr-2 text-xs font-kid text-white" style="width: 0%">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="bg-white/95 card-toy rounded-3xl p-4 sm:p-6 mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg sm:text-xl font-kid text-slate-800 flex items-center gap-2">
+                    <span class="text-2xl">✨</span> Add a New Quest
+                </h2>
+                <button id="quick-idea-btn" type="button" class="text-xs sm:text-sm font-kid bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1 rounded-full border-2 border-slate-800 transition flex items-center gap-1">
+                    <span>🎲</span> Surprise Quest Idea!
+                </button>
+            </div>
+
+            <form id="quest-form" class="space-y-4">
+                <!-- Quest Input Row -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <!-- Selected Icon Preview + Input -->
+                    <div class="flex-1 flex items-center bg-candy-cream rounded-2xl border-3 border-slate-800 px-3 py-2 focus-within:ring-4 focus-within:ring-candy-purple/30 transition" style="border: 3px solid #1E293B;">
+                        <span id="selected-emoji-display" class="text-2xl sm:text-3xl mr-3 select-none">🦷</span>
+                        <input 
+                            type="text" 
+                            id="quest-input" 
+                            placeholder="What awesome thing will you do today?" 
+                            maxlength="60"
+                            required
+                            class="w-full bg-transparent text-base sm:text-lg font-bold text-slate-800 placeholder-slate-400 focus:outline-none"
+                        />
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-toy bg-candy-mint hover:bg-emerald-400 text-slate-900 font-kid text-lg px-6 py-3 rounded-2xl flex items-center justify-center gap-2 flex-shrink-0">
+                        <span>➕ Add Quest!</span>
+                    </button>
+                </div>
+
+                <!-- Emoji Picker + Category + Star Reward Pickers -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-1">
+                    
+                    <!-- Cute Task Emoji Picker (7 cols on md) -->
+                    <div class="md:col-span-7 bg-slate-50 p-3 rounded-2xl border-2 border-slate-200">
+                        <label class="block text-xs font-kid uppercase tracking-wider text-slate-500 mb-2">
+                            1. Pick a Cute Icon:
+                        </label>
+                        <div id="emoji-picker" class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                            <!-- Emojis dynamically populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Category & Stars (5 cols on md) -->
+                    <div class="md:col-span-5 flex flex-col justify-between gap-2 bg-slate-50 p-3 rounded-2xl border-2 border-slate-200">
+                        <div>
+                            <label class="block text-xs font-kid uppercase tracking-wider text-slate-500 mb-1.5">
+                                2. Category & Star Reward:
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="quest-category" class="bg-white font-kid text-sm rounded-xl px-2.5 py-2 border-2 border-slate-800 focus:outline-none cursor-pointer">
+                                    <option value="chores">🧹 Chores</option>
+                                    <option value="homework">📚 Homework</option>
+                                    <option value="health">🥦 Healthy</option>
+                                    <option value="fun">🎨 Fun & Play</option>
+                                    <option value="kindness">💖 Kindness</option>
+                                </select>
+
+                                <select id="quest-stars" class="bg-amber-100 font-kid text-sm rounded-xl px-2.5 py-2 border-2 border-slate-800 focus:outline-none cursor-pointer">
+                                    <option value="1">⭐ 1 Star (Easy)</option>
+                                    <option value="2" selected>⭐⭐ 2 Stars (Med)</option>
+                                    <option value="3">⭐⭐⭐ 3 Stars (Big!)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </section>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <!-- Category Filter Pills -->
+            <div id="filter-tabs" class="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+                <button data-filter="all" class="filter-btn active-filter font-kid text-sm px-4 py-2 rounded-2xl border-2 border-slate-800 bg-slate-800 text-white shadow-sm transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>🌈</span> All Quests
+                </button>
+                <button data-filter="chores" class="filter-btn font-kid text-sm px-3.5 py-2 rounded-2xl border-2 border-slate-800 bg-white hover:bg-pink-100 text-slate-800 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>🧹</span> Chores
+                </button>
+                <button data-filter="homework" class="filter-btn font-kid text-sm px-3.5 py-2 rounded-2xl border-2 border-slate-800 bg-white hover:bg-blue-100 text-slate-800 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>📚</span> Homework
+                </button>
+                <button data-filter="health" class="filter-btn font-kid text-sm px-3.5 py-2 rounded-2xl border-2 border-slate-800 bg-white hover:bg-emerald-100 text-slate-800 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>🥦</span> Healthy
+                </button>
+                <button data-filter="fun" class="filter-btn font-kid text-sm px-3.5 py-2 rounded-2xl border-2 border-slate-800 bg-white hover:bg-amber-100 text-slate-800 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>🎨</span> Fun
+                </button>
+                <button data-filter="kindness" class="filter-btn font-kid text-sm px-3.5 py-2 rounded-2xl border-2 border-slate-800 bg-white hover:bg-purple-100 text-slate-800 transition flex items-center gap-1.5 flex-shrink-0">
+                    <span>💖</span> Kindness
+                </button>
+            </div>
+
+            <!-- Reset / Utility Buttons -->
+            <div class="flex items-center gap-2 self-end sm:self-auto">
+                <button id="clear-completed-btn" class="text-xs font-kid bg-white/90 hover:bg-rose-100 text-slate-700 px-3 py-2 rounded-xl border-2 border-slate-800 transition">
+                    ✨ Clear Done
+                </button>
+                <button id="reset-demo-btn" class="text-xs font-kid bg-white/90 hover:bg-sky-100 text-slate-700 px-3 py-2 rounded-xl border-2 border-slate-800 transition">
+                    🔄 Load Sample Quests
+                </button>
+            </div>
+        </div>
+
+        <main>
+            <div id="quest-list" class="space-y-3.5">
+                <!-- Quest items dynamically injected here -->
+            </div>
+
+            <!-- Empty State Card -->
+            <div id="empty-state" class="hidden bg-white/85 card-toy rounded-3xl p-8 text-center my-4">
+                <div class="text-6xl mb-3 animate-bounce">🎉</div>
+                <h3 class="text-2xl font-kid text-slate-800 mb-1">No Quests Here Right Now!</h3>
+                <p class="text-slate-600 font-bold text-sm sm:text-base max-w-md mx-auto mb-5">
+                    You finished everything in this spot, or you can add a brand new quest above to earn more stars!
+                </p>
+                <button id="empty-add-sample-btn" class="btn-toy bg-candy-yellow hover:bg-amber-300 text-slate-900 font-kid px-5 py-2.5 rounded-2xl text-sm">
+                    🌟 Give Me Fun Quests!
+                </button>
+            </div>
+        </main>
+
+        <section class="mt-8 bg-white/90 card-toy rounded-3xl p-5 sm:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                <div>
+                    <h2 class="text-xl font-kid text-slate-800 flex items-center gap-2">
+                        <span>🏆</span> My Magical Sticker Album
+                    </h2>
+                    <p class="text-xs sm:text-sm font-bold text-slate-500">
+                        Earn stars by completing quests to unlock special collectible stickers!
+                    </p>
+                </div>
+                <span id="unlocked-count-badge" class="self-start sm:self-auto font-kid text-xs sm:text-sm bg-candy-yellow px-3.5 py-1 rounded-full border-2 border-slate-800">
+                    0 / 8 Unlocked
+                </span>
+            </div>
+
+            <div id="sticker-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
+                <!-- Stickers generated by JS -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Edit Kid Profile Modal -->
+    <div id="profile-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden items-center justify-center p-4">
+        <div class="bg-white card-toy rounded-3xl max-w-md w-full p-6 animate-pop">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-kid text-slate-800">🎨 Customize Your Hero!</h3>
+                <button id="close-profile-modal" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-rose-100 border-2 border-slate-800 font-kid text-lg flex items-center justify-center">✕</button>
+            </div>
+            <form id="profile-form" class="space-y-4">
+                <div>
+                    <label class="block font-kid text-sm text-slate-700 mb-1">Your Hero Name:</label>
+                    <input type="text" id="profile-name-input" maxlength="18" required class="w-full px-4 py-2.5 rounded-2xl border-3 border-slate-800 font-kid text-lg bg-candy-cream focus:outline-none" style="border: 3px solid #1E293B;" />
+                </div>
+                <div>
+                    <label class="block font-kid text-sm text-slate-700 mb-2">Pick Your Buddy Mascot:</label>
+                    <div id="mascot-picker" class="grid grid-cols-5 gap-2">
+                        <!-- Mascot choices populated by JS -->
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="submit" class="btn-toy w-full bg-candy-mint text-slate-900 font-kid py-3 rounded-2xl text-lg">
+                        ✅ Save My Hero!
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="toast-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform translate-y-4">
+        <div class="bg-slate-900 text-white font-kid px-5 py-3 rounded-2xl border-2 border-white shadow-xl flex items-center gap-2.5 text-sm sm:text-base">
+            <span id="toast-icon" class="text-xl">🌟</span>
+            <span id="toast-message">Awesome job!</span>
+        </div>
+    </div>
+
+    <script>
+        // --- APPLICATION CONSTANTS & KID-FRIENDLY DATA ---
+        const STORAGE_KEY = 'starquest_kids_todo_v1';
+
+        const TASK_EMOJIS = [
+            '🦷', '🛏️', '📚', '🎨', '🧹', '🥦', '🐕', '🎹', 
+            '🚲', '🧩', '🎒', '🍎', '🚿', '🪴', '🧸', '⚽', '💖', '🥤'
+        ];
+
+        const MASCOTS = ['🦄', '🦖', '🐼', '🦊', '🦁', '🐸', '🐨', '🐙', '🐝', '🚀'];
+
+        const CATEGORIES = {
+            chores: { label: 'Chores', emoji: '🧹', bg: 'bg-pink-100', border: 'border-pink-300', badge: 'bg-candy-pink text-white', cardTint: 'bg-gradient-to-r from-pink-50 to-white' },
+            homework: { label: 'Homework', emoji: '📚', bg: 'bg-sky-100', border: 'border-sky-300', badge: 'bg-candy-blue text-slate-900', cardTint: 'bg-gradient-to-r from-sky-50 to-white' },
+            health: { label: 'Healthy', emoji: '🥦', bg: 'bg-emerald-100', border: 'border-emerald-300', badge: 'bg-candy-mint text-slate-900', cardTint: 'bg-gradient-to-r from-emerald-50 to-white' },
+            fun: { label: 'Fun & Play', emoji: '🎨', bg: 'bg-amber-100', border: 'border-amber-300', badge: 'bg-candy-yellow text-slate-900', cardTint: 'bg-gradient-to-r from-amber-50 to-white' },
+            kindness: { label: 'Kindness', emoji: '💖', bg: 'bg-purple-100', border: 'border-purple-300', badge: 'bg-candy-purple text-white', cardTint: 'bg-gradient-to-r from-purple-50 to-white' }
+        };
+
+        const STICKER_REWARDS = [
+            { id: 's1', name: 'Happy Star', emoji: '🌟', starsRequired: 3 },
+            { id: 's2', name: 'Super Rocket', emoji: '🚀', starsRequired: 6 },
+            { id: 's3', name: 'Rainbow Magic', emoji: '🌈', starsRequired: 10 },
+            { id: 's4', name: 'Cool Dino', emoji: '🦖', starsRequired: 15 },
+            { id: 's5', name: 'Sweet Cupcake', emoji: '🧁', starsRequired: 20 },
+            { id: 's6', name: 'Magic Unicorn', emoji: '🦄', starsRequired: 25 },
+            { id: 's7', name: 'Golden Trophy', emoji: '🏆', starsRequired: 32 },
+            { id: 's8', name: 'Galaxy Crown', emoji: '👑', starsRequired: 40 }
+        ];
+
+        const SURPRISE_QUESTS = [
+            { title: 'Put away 5 toys in the toy box', emoji: '🧸', category: 'chores', stars: 2 },
+            { title: 'Drink a big glass of water', emoji: '🥤', category: 'health', stars: 1 },
+            { title: 'Read 10 pages of a fun storybook', emoji: '📚', category: 'homework', stars: 3 },
+            { title: 'Give someone in the family a big hug', emoji: '💖', category: 'kindness', stars: 2 },
+            { title: 'Draw a picture of a friendly monster', emoji: '🎨', category: 'fun', stars: 2 },
+            { title: 'Make my bed super neat and cozy', emoji: '🛏️', category: 'chores', stars: 2 },
+            { title: 'Brush teeth for 2 whole minutes', emoji: '🦷', category: 'health', stars: 2 },
+            { title: 'Practice spelling or math flashcards', emoji: '🎒', category: 'homework', stars: 3 },
+            { title: 'Do 10 bunny hops in the living room', emoji: '⚽', category: 'fun', stars: 1 }
+        ];
+
+        const PEP_TALKS = [
+            "You're doing super-duper awesome today!",
+            "Every quest you finish makes your star bank shine!",
+            "Ooh! Which fun quest should we check off next?",
+            "High five! You are a true Quest Champion!",
+            "Keep going! Magical stickers are waiting for you!"
+        ];
+
+        const DEFAULT_QUESTS = [
+            { id: 'q1', title: 'Brush my teeth until they sparkle', emoji: '🦷', category: 'health', stars: 2, completed: false },
+            { id: 'q2', title: 'Make my bed & fluff the pillows', emoji: '🛏️', category: 'chores', stars: 2, completed: false },
+            { id: 'q3', title: 'Read a fun chapter book for 15 mins', emoji: '📚', category: 'homework', stars: 3, completed: false },
+            { id: 'q4', title: 'Pick up toys & Lego bricks from the floor', emoji: '🧸', category: 'chores', stars: 2, completed: true },
+            { id: 'q5', title: 'Draw a colorful picture or build something', emoji: '🎨', category: 'fun', stars: 1, completed: false },
+            { id: 'q6', title: 'Say something kind to make someone smile', emoji: '💖', category: 'kindness', stars: 2, completed: false }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let state = {
+            kidName: 'Alex',
+            mascot: '🦄',
+            stars: 4,
+            soundEnabled: true,
+            selectedEmoji: '🦷',
+            activeFilter: 'all',
+            quests: []
+        };
+
+        // Load or Initialize State from LocalStorage
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                } else {
+                    state.quests = JSON.parse(JSON.stringify(DEFAULT_QUESTS));
+                }
+            } catch (e) {
+                console.warn('Could not read from localStorage:', e);
+                state.quests = JSON.parse(JSON.stringify(DEFAULT_QUESTS));
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn('Could not save to localStorage:', e);
+            }
+        }
+
+        // --- WEB AUDIO SYNTHESIZER (NO EXTERNAL MP3 NEEDED) ---
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            const ctx = getAudioContext();
+            if (!ctx) return;
+
+            const now = ctx.currentTime;
+
+            if (type === 'complete') {
+                // Happy ascending arpeggio chime
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.075);
+
+                    gain.gain.setValueAtTime(0.001, now + idx * 0.075);
+                    gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.075 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.075 + 0.28);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.075);
+                    osc.stop(now + idx * 0.075 + 0.3);
+                });
+            } else if (type === 'pop') {
+                // Cute bubble pop
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(680, now + 0.09);
+
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.11);
+            } else if (type === 'uncheck') {
+                // Soft descending boop
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(260, now + 0.12);
+
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.14);
+            } else if (type === 'fanfare') {
+                // All quests done celebration fanfare
+                const notes = [523.25, 659.25, 783.99, 659.25, 1046.50];
+                const times = [0, 0.11, 0.22, 0.33, 0.45];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + times[idx]);
+
+                    gain.gain.setValueAtTime(0.2, now + times[idx]);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + times[idx] + 0.35);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + times[idx]);
+                    osc.stop(now + times[idx] + 0.36);
+                });
+            }
+        }
+
+        // --- CONFETTI ENGINE ---
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let confettiAnimating = false;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeConfettiCanvas);
+        resizeConfettiCanvas();
+
+        function launchConfetti(originX = window.innerWidth / 2, originY = window.innerHeight / 2, count = 65) {
+            const colors = ['#FF6B9E', '#9B72FF', '#FFD166', '#06D6A0', '#4CC9F0', '#FF9F1C'];
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 4 + Math.random() * 10;
+                confettiParticles.push({
+                    x: originX,
+                    y: originY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 4,
+                    size: 7 + Math.random() * 7,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 12,
+                    gravity: 0.25 + Math.random() * 0.1,
+                    opacity: 1,
+                    shape: Math.random() > 0.35 ? 'rect' : 'circle'
+                });
+            }
+            if (!confettiAnimating) {
+                confettiAnimating = true;
+                requestAnimationFrame(updateConfetti);
+            }
+        }
+
+        function updateConfetti() {
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+            confettiParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.vx *= 0.99;
+                p.rotation += p.rotationSpeed;
+                p.opacity -= 0.012;
+
+                confettiCtx.save();
+                confettiCtx.translate(p.x, p.y);
+                confettiCtx.rotate((p.rotation * Math.PI) / 180);
+                confettiCtx.globalAlpha = Math.max(0, p.opacity);
+                confettiCtx.fillStyle = p.color;
+
+                if (p.shape === 'rect') {
+                    confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+                } else {
+                    confettiCtx.beginPath();
+                    confettiCtx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                    confettiCtx.fill();
+                }
+                confettiCtx.restore();
+            });
+
+            confettiParticles = confettiParticles.filter(p => p.opacity > 0 && p.y < confettiCanvas.height + 40);
+
+            if (confettiParticles.length > 0) {
+                requestAnimationFrame(updateConfetti);
+            } else {
+                confettiAnimating = false;
+                confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            }
+        }
+
+        // Spawn Floating "+2 ⭐" at click position
+        function spawnFloatingStarText(x, y, starsCount) {
+            const el = document.createElement('div');
+            el.className = 'floating-reward font-kid text-2xl sm:text-3xl text-amber-500 drop-shadow-md flex items-center gap-1 bg-white px-3 py-1 rounded-full border-2 border-slate-800';
+            el.style.left = `${Math.max(20, Math.min(window.innerWidth - 120, x - 40))}px`;
+            el.style.top = `${Math.max(20, y - 20)}px`;
+            el.innerHTML = `+${starsCount} ⭐`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1100);
+        }
+
+        // --- UI RENDERING FUNCTIONS ---
+        function getRankTitle(stars) {
+            if (stars >= 40) return '👑 LVL 6 GALAXY ROYALTY';
+            if (stars >= 28) return '🦄 LVL 5 MAGIC LEGEND';
+            if (stars >= 18) return '🚀 LVL 4 SPACE CAPTAIN';
+            if (stars >= 10) return '🦖 LVL 3 DINO HERO';
+            if (stars >= 5)  return '🌈 LVL 2 STAR CATCHER';
+            return '🌟 LVL 1 EXPLORER';
+        }
+
+        function showToast(message, icon = '🌟') {
+            const banner = document.getElementById('toast-banner');
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast-icon').textContent = icon;
+            banner.classList.remove('opacity-0', 'translate-y-4');
+            banner.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                banner.classList.remove('opacity-100', 'translate-y-0');
+                banner.classList.add('opacity-0', 'translate-y-4');
+            }, 2600);
+        }
+
+        function renderEmojiPicker() {
+            const container = document.getElementById('emoji-picker');
+            container.innerHTML = '';
+            TASK_EMOJIS.forEach(emoji => {
+                const isSelected = emoji === state.selectedEmoji;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `w-10 h-10 rounded-xl text-xl flex items-center justify-center flex-shrink-0 transition transform ${
+                    isSelected 
+                        ? 'bg-candy-yellow border-2 border-slate-800 scale-110 shadow-sm' 
+                        : 'bg-white hover:bg-amber-50 border border-slate-200'
+                }`;
+                btn.textContent = emoji;
+                btn.addEventListener('click', () => {
+                    state.selectedEmoji = emoji;
+                    document.getElementById('selected-emoji-display').textContent = emoji;
+                    playSound('pop');
+                    renderEmojiPicker();
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        function renderHeaderAndProgress() {
+            document.getElementById('kid-name-display').textContent = state.kidName;
+            document.getElementById('mascot-emoji').textContent = state.mascot;
+            document.getElementById('star-count').textContent = state.stars;
+            document.getElementById('rank-badge').textContent = getRankTitle(state.stars);
+
+            const soundBtn = document.getElementById('sound-toggle-btn');
+            soundBtn.textContent = state.soundEnabled ? '🔊' : '🔇';
+            soundBtn.className = `btn-toy ${state.soundEnabled ? 'bg-candy-blue' : 'bg-slate-200'} text-slate-900 font-kid w-12 h-12 rounded-2xl flex items-center justify-center text-xl`;
+
+            // Calculate Progress
+            const total = state.quests.length;
+            const completed = state.quests.filter(q => q.completed).length;
+            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+            document.getElementById('progress-text').textContent = `${completed} / ${total} Done (${percent}%)`;
+            const bar = document.getElementById('progress-bar');
+            bar.style.width = `${percent}%`;
+            bar.textContent = percent >= 15 ? `${percent}%` : '';
+        }
+
+        function renderFilterTabs() {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                const filter = btn.getAttribute('data-filter');
+                if (filter === state.activeFilter) {
+                    btn.className = 'filter-btn font-kid text-sm px-4 py-2 rounded-2xl border-2 border-slate-800 bg-slate-800 text-white shadow-sm transition flex items-center gap-1.5 flex-shrink-0 scale-105';
+                } else {
+                    btn.className = 'filter-btn font-kid text-sm px-3.5 py-2 rounded-2xl border-2 border-slate-800 bg-white hover:bg-amber-100 text-slate-800 transition flex items-center gap-1.5 flex-shrink-0';
+                }
+            });
+        }
+
+        function renderQuests() {
+            const listEl = document.getElementById('quest-list');
+            const emptyEl = document.getElementById('empty-state');
+            listEl.innerHTML = '';
+
+            const filtered = state.quests.filter(q => {
+                if (state.activeFilter === 'all') return true;
+                return q.category === state.activeFilter;
+            });
+
+            // Sort: uncompleted first, then completed
+            const sorted = [...filtered].sort((a, b) => Number(a.completed) - Number(b.completed));
+
+            if (sorted.length === 0) {
+                emptyEl.classList.remove('hidden');
+            } else {
+                emptyEl.classList.add('hidden');
+            }
+
+            sorted.forEach(quest => {
+                const cat = CATEGORIES[quest.category] || CATEGORIES.fun;
+                const starsDisplay = '⭐'.repeat(quest.stars);
+
+                const card = document.createElement('div');
+                card.className = `card-toy rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 transition-all ${
+                    quest.completed ? 'bg-slate-100/90 opacity-75' : cat.cardTint
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                        <!-- Custom Big Tactile Check Button -->
+                        <button 
+                            data-action="toggle" 
+                            data-id="${quest.id}"
+                            aria-label="Complete quest"
+                            class="check-circle w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center flex-shrink-0 cursor-pointer ${
+                                quest.completed 
+                                    ? 'bg-candy-mint text-slate-900' 
+                                    : 'bg-white hover:bg-amber-100 text-transparent'
+                            }"
+                        >
+                            <svg class="w-7 h-7 stroke-[3.5] ${quest.completed ? 'scale-100' : 'scale-0'} transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Task Emoji Bubble -->
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl ${cat.bg} border-2 border-slate-800 flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0">
+                            ${quest.emoji}
+                        </div>
+
+                        <!-- Task Title & Category Metadata -->
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                                <span class="text-[11px] font-kid px-2.5 py-0.5 rounded-full border border-slate-800 ${cat.badge}">
+                                    ${cat.emoji} ${cat.label}
+                                </span>
+                                <span class="text-xs font-kid bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full border border-slate-800">
+                                    ${starsDisplay} +${quest.stars}
+                                </span>
+                            </div>
+                            <p class="font-bold text-base sm:text-lg text-slate-800 truncate ${
+                                quest.completed ? 'line-through text-slate-400' : ''
+                            }">
+                                ${escapeHTML(quest.title)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Delete Quest Button -->
+                    <button 
+                        data-action="delete" 
+                        data-id="${quest.id}" 
+                        title="Remove Quest"
+                        class="w-10 h-10 rounded-xl bg-white hover:bg-rose-100 text-slate-400 hover:text-rose-600 border-2 border-slate-200 hover:border-slate-800 flex items-center justify-center flex-shrink-0 transition"
+                    >
+                        🗑️
+                    </button>
+                `;
+
+                listEl.appendChild(card);
+            });
+        }
+
+        function renderStickers() {
+            const grid = document.getElementById('sticker-grid');
+            grid.innerHTML = '';
+            let unlockedCount = 0;
+
+            STICKER_REWARDS.forEach(sticker => {
+                const unlocked = state.stars >= sticker.starsRequired;
+                if (unlocked) unlockedCount++;
+
+                const item = document.createElement('div');
+                item.className = `rounded-2xl p-3 border-2 border-slate-800 flex flex-col items-center justify-center text-center transition ${
+                    unlocked 
+                        ? 'bg-gradient-to-b from-amber-50 to-white shadow-sm hover:scale-105 cursor-pointer' 
+                        : 'bg-slate-100 opacity-60'
+                }`;
+
+                item.innerHTML = `
+                    <div class="text-3xl sm:text-4xl mb-1 ${unlocked ? 'animate-float' : 'grayscale'}">
+                        ${unlocked ? sticker.emoji : '🔒'}
+                    </div>
+                    <div class="font-kid text-xs text-slate-800 leading-tight">${sticker.name}</div>
+                    <div class="text-[11px] font-bold mt-1 px-2 py-0.5 rounded-full ${
+                        unlocked ? 'bg-candy-mint text-slate-900' : 'bg-slate-200 text-slate-600'
+                    }">
+                        ${unlocked ? 'Unlocked!' : `${sticker.starsRequired} ⭐`}
+                    </div>
+                `;
+
+                if (unlocked) {
+                    item.addEventListener('click', (e) => {
+                        playSound('pop');
+                        launchConfetti(e.clientX, e.clientY, 25);
+                        showToast(`You own the ${sticker.name} sticker!`, sticker.emoji);
+                    });
+                }
+
+                grid.appendChild(item);
+            });
+
+            document.getElementById('unlocked-count-badge').textContent = `${unlockedCount} / ${STICKER_REWARDS.length} Unlocked`;
+        }
+
+        function renderAll() {
+            renderHeaderAndProgress();
+            renderFilterTabs();
+            renderQuests();
+            renderStickers();
+        }
+
+        function escapeHTML(str) {
+            const p = document.createElement('p');
+            p.textContent = str;
+            return p.innerHTML;
+        }
+
+        // --- INTERACTION HANDLERS ---
+        // Toggle or Delete Quest via Event Delegation
+        document.getElementById('quest-list').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+
+            const action = btn.getAttribute('data-action');
+            const id = btn.getAttribute('data-id');
+            const questIndex = state.quests.findIndex(q => q.id === id);
+            if (questIndex === -1) return;
+
+            const quest = state.quests[questIndex];
+
+            if (action === 'toggle') {
+                quest.completed = !quest.completed;
+                const rect = btn.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                if (quest.completed) {
+                    state.stars += Number(quest.stars);
+                    playSound('complete');
+                    launchConfetti(centerX, centerY, 55);
+                    spawnFloatingStarText(centerX, centerY, quest.stars);
+
+                    // Animate Star Bank
+                    const starBox = document.getElementById('star-bank-box');
+                    starBox.classList.remove('animate-bounce-short');
+                    void starBox.offsetWidth;
+                    starBox.classList.add('animate-bounce-short');
+
+                    // Check if ALL tasks are now completed
+                    const allDone = state.quests.length > 0 && state.quests.every(q => q.completed);
+                    if (allDone) {
+                        setTimeout(() => {
+                            playSound('fanfare');
+                            launchConfetti(window.innerWidth / 2, window.innerHeight / 3, 120);
+                            showToast('HOORAY! You finished ALL your quests today!', '🏆');
+                        }, 350);
+                    } else {
+                        showToast(`Awesome! You earned +${quest.stars} stars!`, '⭐');
+                    }
+                } else {
+                    state.stars = Math.max(0, state.stars - Number(quest.stars));
+                    playSound('uncheck');
+                }
+
+                saveState();
+                renderAll();
+            } else if (action === 'delete') {
+                playSound('uncheck');
+                state.quests.splice(questIndex, 1);
+                saveState();
+                renderAll();
+                showToast('Quest removed!', '🗑️');
+            }
+        });
+
+        // Add New Quest Form Submission
+        document.getElementById('quest-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('quest-input');
+            const category = document.getElementById('quest-category').value;
+            const stars = parseInt(document.getElementById('quest-stars').value, 10) || 2;
+
+            const title = input.value.trim();
+            if (!title) return;
+
+            const newQuest = {
+                id: 'q_' + Date.now(),
+                title,
+                emoji: state.selectedEmoji,
+                category,
+                stars,
+                completed: false
+            };
+
+            state.quests.unshift(newQuest);
+            input.value = '';
+            playSound('pop');
+            saveState();
+            renderAll();
+            showToast('New quest added! Let\'s go!', newQuest.emoji);
+        });
+
+        // Surprise Quest Idea Button
+        document.getElementById('quick-idea-btn').addEventListener('click', () => {
+            const randomIdea = SURPRISE_QUESTS[Math.floor(Math.random() * SURPRISE_QUESTS.length)];
+            document.getElementById('quest-input').value = randomIdea.title;
+            document.getElementById('quest-category').value = randomIdea.category;
+            document.getElementById('quest-stars').value = String(randomIdea.stars);
+            state.selectedEmoji = randomIdea.emoji;
+            document.getElementById('selected-emoji-display').textContent = randomIdea.emoji;
+            playSound('pop');
+            renderEmojiPicker();
+            showToast('Surprise idea loaded! Click Add Quest!', '🎲');
+        });
+
+        // Category Filter Buttons
+        document.getElementById('filter-tabs').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-filter]');
+            if (!btn) return;
+            state.activeFilter = btn.getAttribute('data-filter');
+            playSound('pop');
+            renderAll();
+        });
+
+        // Clear Completed Quests
+        document.getElementById('clear-completed-btn').addEventListener('click', () => {
+            const completedCount = state.quests.filter(q => q.completed).length;
+            if (completedCount === 0) {
+                showToast('No finished quests to clear yet!', '✨');
+                return;
+            }
+            state.quests = state.quests.filter(q => !q.completed);
+            playSound('pop');
+            saveState();
+            renderAll();
+            showToast(`Cleared ${completedCount} finished quest${completedCount > 1 ? 's' : ''}!`, '✨');
+        });
+
+        // Load Sample Quests
+        function loadSampleQuests() {
+            state.quests = JSON.parse(JSON.stringify(DEFAULT_QUESTS));
+            state.activeFilter = 'all';
+            playSound('pop');
+            saveState();
+            renderAll();
+            showToast('Sample quests loaded!', '🌈');
+        }
+        document.getElementById('reset-demo-btn').addEventListener('click', loadSampleQuests);
+        document.getElementById('empty-add-sample-btn').addEventListener('click', loadSampleQuests);
+
+        // Mascot Pep Talk Click
+        document.getElementById('mascot-btn').addEventListener('click', (e) => {
+            playSound('pop');
+            const talk = PEP_TALKS[Math.floor(Math.random() * PEP_TALKS.length)];
+            document.getElementById('mascot-speech').textContent = `"${talk}"`;
+            launchConfetti(e.clientX, e.clientY, 20);
+        });
+
+        // Sound Toggle
+        document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+            state.soundEnabled = !state.soundEnabled;
+            if (state.soundEnabled) playSound('pop');
+            saveState();
+            renderHeaderAndProgress();
+            showToast(state.soundEnabled ? 'Sound Effects ON!' : 'Sound Effects Muted', state.soundEnabled ? '🔊' : '🔇');
+        });
+
+        // Scroll to Sticker Album
+        document.getElementById('open-stickers-btn').addEventListener('click', () => {
+            playSound('pop');
+            document.getElementById('sticker-grid').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // --- HERO PROFILE CUSTOMIZATION MODAL ---
+        const profileModal = document.getElementById('profile-modal');
+        let tempMascot = state.mascot;
+
+        function renderMascotPicker() {
+            const container = document.getElementById('mascot-picker');
+            container.innerHTML = '';
+            MASCOTS.forEach(m => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `h-12 rounded-2xl text-2xl flex items-center justify-center border-2 transition ${
+                    m === tempMascot ? 'bg-candy-yellow border-slate-800 scale-105' : 'bg-slate-50 border-slate-200 hover:bg-amber-50'
+                }`;
+                btn.textContent = m;
+                btn.addEventListener('click', () => {
+                    tempMascot = m;
+                    playSound('pop');
+                    renderMascotPicker();
+                });
+                container.appendChild(btn);
+            });
+        }
+
+        document.getElementById('edit-name-btn').addEventListener('click', () => {
+            playSound('pop');
+            tempMascot = state.mascot;
+            document.getElementById('profile-name-input').value = state.kidName;
+            renderMascotPicker();
+            profileModal.classList.remove('hidden');
+            profileModal.classList.add('flex');
+        });
+
+        document.getElementById('close-profile-modal').addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+        });
+
+        document.getElementById('profile-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newName = document.getElementById('profile-name-input').value.trim();
+            if (newName) {
+                state.kidName = newName;
+                state.mascot = tempMascot;
+                saveState();
+                renderHeaderAndProgress();
+                playSound('complete');
+                showToast(`Welcome, Hero ${state.kidName}!`, state.mascot);
+            }
+            profileModal.classList.add('hidden');
+            profileModal.classList.remove('flex');
+        });
+
+        // Initialize Current Friendly Date
+        function initDateDisplay() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+            document.getElementById('current-date').textContent = '📅 ' + now.toLocaleDateString('en-US', options);
+        }
+
+        // Start App on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initDateDisplay();
+            loadState();
+            renderEmojiPicker();
+            renderAll();
+        });
+    </script>
+</body>
+</html>
